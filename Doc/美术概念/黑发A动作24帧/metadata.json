@@ -1,0 +1,16 @@
+{
+  "framesPerAction": 24,
+  "previewFps": 12.5,
+  "frameSize": [
+    400,
+    400
+  ],
+  "sheetColumns": 6,
+  "sheetRows": 4,
+  "actions": [
+    "walk",
+    "jump",
+    "attack"
+  ],
+  "note": "Generated concept animation; jump preview adds display-only vertical trajectory, not game physics."
+}

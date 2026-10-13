@@ -45,3 +45,7 @@ NPC 的行为用状态机组织，思路对应 CSE2 的 `act_no`；移动和碰�
 2026-10-13：Unity 6000.0.28f1 批处理编译通过，测试场景生成通过；进入 Play Mode 后验证了玩家落地、三只敌人生成、连续受伤保护、经验计数和子弹生成。尚未进行人工画面检查、键盘操作及完整战斗流程验收。
 
 `Assets/Editor/PrototypeSmokeCheck.cs` 是上述运行检查的入口，可通过 Unity 批处理 `-executeMethod NewGame.Editor.PrototypeSmokeCheck.Run` 执行（不要同时传 `-quit`，检查完成会自动退出）。
+
+## macOS 窗口版
+
+在 Unity 菜单执行 **New Game → Build Windowed Mac App**，输出到 `Builds/macOS/A Little.app`。默认窗口 1100 × 700，允许调整窗口大小。双击该应用可独立运行，不需要打开 Unity 编辑器。

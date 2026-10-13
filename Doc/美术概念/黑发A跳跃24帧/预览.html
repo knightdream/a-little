@@ -1,0 +1,29 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>黑发 A · 固定高度跳跃</title><style>body{background:#121928;color:#e8e8e4;font:16px system-ui;max-width:960px;margin:24px auto;padding:0 16px}h1{font-size:25px}canvas{width:100%;background:#121928;border:1px solid #344357;border-radius:12px}p{line-height:1.7;color:#b1bece}button{background:#263448;color:white;border:1px solid #596479;border-radius:8px;padding:12px 25px;margin:6px;font:inherit;touch-action:none}#status{color:#e7cc89}</style><h1>黑发 A · 固定高度跳跃</h1><p>A / D 或 ← / → 移动，空格跳跃。空中可以停下或转向；长按和短按跳跃高度相同。</p><canvas id="cv" width="960" height="600" tabindex="0"></canvas><div><button data-key="ArrowLeft">← 左移</button><button data-key="Space">跳跃</button><button data-key="ArrowRight">右移 →</button><button id="reset">复位</button></div><p id="status">正在加载动画…</p><p>24 帧部件动画预览。虚线表示角色脚底基准的最高点；屈膝姿势会让实际脚底稍高。尚未接入 Unity。</p><script src="motion.js"></script><script>
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d'),status=document.getElementById('status');
+const keys=new Set(),poses=[],runs=[];let ready=false,x=360,face=1,state='idle',age=0,clock=0,last=0;
+function load(target,path){return Promise.all(Array.from({length:24},(_,i)=>new Promise((resolve,reject)=>{const im=new Image();target[i]=im;im.onload=resolve;im.onerror=reject;im.src=path+'/'+String(i).padStart(2,'0')+'.png'})))}
+Promise.all([load(poses,'jump'),load(runs,'../黑发A跑步24帧/run')]).then(()=>{ready=true;status.textContent='可以开始：空格跳跃，左右键调整横向距离。'}).catch(()=>status.textContent='图片加载失败，请保留原文件夹结构。');
+function press(k){if(k==='Space'&&!keys.has(k)&&state==='idle'&&ready){state='prep';age=0}keys.add(k)}
+window.addEventListener('keydown',e=>{if(['Space','ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code)){e.preventDefault();press(e.code)}});
+window.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',()=>keys.clear());
+for(const b of document.querySelectorAll('[data-key]')){b.onpointerdown=e=>{b.setPointerCapture(e.pointerId);press(b.dataset.key)};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.key)}
+document.getElementById('reset').onclick=()=>{x=360;state='idle';age=0;face=1;keys.clear()};
+function tick(now){let dt=Math.min(.033,(now-last)/1000||0);last=now;clock+=dt;
+ if(ready){const axis=Number(keys.has('ArrowRight')||keys.has('KeyD'))-Number(keys.has('ArrowLeft')||keys.has('KeyA'));x=JumpMotion.horizontal(x,axis,dt);if(axis)face=axis;
+ age+=dt;
+ if(state==='prep'&&age>=.12){state='air';age=0}
+ if(state==='air'&&age>=JumpMotion.duration){state='land';age=0}
+ if(state==='land'&&age>=.16){state='idle';age=0}
+ let height=state==='air'?JumpMotion.sample(age):0,index=0;
+ if(state==='prep')index=Math.min(3,Math.floor(age/.03));
+ if(state==='air')index=4+Math.min(15,Math.floor(age/JumpMotion.duration*16));
+ if(state==='land')index=20+Math.min(3,Math.floor(age/.04));
+ const im=state==='idle'&&axis?runs[Math.floor(clock*25)%24]:poses[index];
+ ctx.clearRect(0,0,960,600);ctx.strokeStyle='#43576b';ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(0,520);ctx.lineTo(960,520);ctx.stroke();
+ ctx.strokeStyle='#566450';ctx.setLineDash([5,8]);ctx.beginPath();ctx.moveTo(0,520-JumpMotion.height);ctx.lineTo(960,520-JumpMotion.height);ctx.stroke();ctx.setLineDash([]);
+ ctx.fillStyle='#b1bece';ctx.font='15px system-ui';ctx.fillText('固定跳高 140 px',20,370);
+ ctx.fillStyle='rgba(0,0,0,.3)';ctx.beginPath();ctx.ellipse(x,522,26-height*.06,5,0,0,Math.PI*2);ctx.fill();
+ ctx.save();ctx.translate(x,520-height);ctx.scale(face*.8,.8);ctx.drawImage(im,-210,-432);ctx.restore();
+ status.textContent=({idle:'地面',prep:'起跳准备',air:age<JumpMotion.duration/2?'上升':'下落',land:'落地缓冲'})[state]+' · 高度 '+Math.round(height)+' / 140 · 横向 '+(axis<0?'向左':axis>0?'向右':'停止');
+ }requestAnimationFrame(tick)}requestAnimationFrame(tick);
+</script></html>
