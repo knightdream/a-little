@@ -1,0 +1,12 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TestRoom.unity
+    guid: ce26f76672be24eefa412f1f098be5bc
+  m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0
